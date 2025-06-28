@@ -1,0 +1,281 @@
+.home {
+  min-height: 100vh;
+}
+
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* Dynamic Demo Section */
+.dynamic-demo {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 25px 20px;
+  margin: 30px 0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dynamic-demo h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.dynamic-demo p {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.counter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.counter-buttons .btn {
+  min-width: 120px;
+  min-height: 44px; /* Touch target size */
+  font-size: 14px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.hero-actions .btn {
+  min-width: 160px;
+  min-height: 48px; /* Larger touch target for primary actions */
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.features {
+  padding: 60px 0;
+  background-color: var(--bg-secondary);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.features h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: var(--text-primary);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 25px;
+}
+
+.feature-card {
+  background: var(--bg-primary);
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--border-primary);
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.feature-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) {
+  .hero {
+    padding: 80px 0;
+  }
+  
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero p {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+  }
+  
+  .dynamic-demo {
+    padding: 30px;
+    margin: 40px 0;
+  }
+  
+  .dynamic-demo h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .dynamic-demo p {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+  
+  .counter-buttons {
+    flex-direction: row;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  .hero-actions {
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .features {
+    padding: 80px 0;
+  }
+  
+  .container {
+    padding: 0 20px;
+  }
+  
+  .features h2 {
+    font-size: 2.5rem;
+    margin-bottom: 60px;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+  
+  .feature-card {
+    padding: 35px 30px;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+  
+  .feature-card p {
+    font-size: 1rem;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+  .hero {
+    padding: 100px 0;
+  }
+  
+  .hero h1 {
+    font-size: 3.5rem;
+  }
+  
+  .hero p {
+    font-size: 1.25rem;
+  }
+  
+  .hero-content {
+    padding: 0 30px;
+  }
+  
+  .container {
+    padding: 0 30px;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .feature-card {
+    padding: 40px;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  .hero-content {
+    padding: 0 40px;
+  }
+  
+  .container {
+    padding: 0 40px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .feature-card:hover {
+    transform: none;
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+  
+  /* Increase touch targets */
+  .btn {
+    min-height: 44px;
+  }
+  
+  .nav-list a {
+    padding: 12px 8px;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+} 
