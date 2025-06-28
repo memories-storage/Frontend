@@ -4,15 +4,19 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8
 // API Endpoints
 export const ENDPOINTS = {
   // Auth endpoints
-  LOGIN: '/auth/login',
-  REGISTER: '/auth/register',
-  LOGOUT: '/auth/logout',
+  LOGIN: '/login',
+  REGISTER: '/signup',
+  LOGOUT: '/logout',
   REFRESH_TOKEN: '/auth/refresh',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESEND_RESET_EMAIL: '/resend-reset-email',
+  RESET_PASSWORD: '/auth/reset-password',
   
   // User endpoints
   USERS: '/users',
   USER_PROFILE: '/users/profile',
   UPDATE_PROFILE: '/users/profile/update',
+  CHANGE_PASSWORD: '/users/change-password',
   
   // Project endpoints
   PROJECTS: '/projects',
@@ -43,6 +47,9 @@ export const HTTP_STATUS = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
   INTERNAL_SERVER_ERROR: 500,
 };
 

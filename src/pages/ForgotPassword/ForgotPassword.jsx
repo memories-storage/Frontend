@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiService } from '../../services/api';
+import { ENDPOINTS } from '../../utils/constants/api';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -24,21 +26,53 @@ const ForgotPassword = () => {
 
         // Basic email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(email.trim())) {
             setError('Please enter a valid email address');
             setLoading(false);
             return;
         }
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // For demo purposes, accept any valid email
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('email', email.trim());
+
+            const response = await apiService.postForm(ENDPOINTS.FORGOT_PASSWORD, formData);
+
+            // Handle successful response
             setEmailSent(true);
-            setSuccess('Password reset link has been sent to your email address');
-        } catch (err) {
-            setError('Failed to send reset email. Please try again.');
+            setSuccess(response.message || 'Password reset link has been sent to your email address');
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            
+            // Handle different types of errors
+            if (error.response) {
+                const { status, data } = error.response;
+                
+                switch (status) {
+                    case 400:
+                        setError(data.message || 'Invalid email address');
+                        break;
+                    case 404:
+                        setError('Email address not found in our system');
+                        break;
+                    case 422:
+                        setError(data.message || 'Invalid email format');
+                        break;
+                    case 429:
+                        setError('Too many requests. Please wait a moment before trying again.');
+                        break;
+                    case 500:
+                        setError('Server error. Please try again later.');
+                        break;
+                    default:
+                        setError(data.message || 'Failed to send reset email. Please try again.');
+                }
+            } else if (error.request) {
+                setError('Network error. Please check your connection and try again.');
+            } else {
+                setError('An unexpected error occurred. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -49,10 +83,34 @@ const ForgotPassword = () => {
         setError('');
         
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setSuccess('Reset link has been resent to your email');
-        } catch (err) {
-            setError('Failed to resend email. Please try again.');
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('email', email.trim());
+
+            const response = await apiService.postForm(ENDPOINTS.RESEND_RESET_EMAIL, formData);
+
+            setSuccess(response.message || 'Reset link has been resent to your email');
+        } catch (error) {
+            console.error('Resend email error:', error);
+            
+            if (error.response) {
+                const { status, data } = error.response;
+                
+                switch (status) {
+                    case 429:
+                        setError('Too many resend attempts. Please wait before trying again.');
+                        break;
+                    case 400:
+                        setError(data.message || 'Failed to resend email');
+                        break;
+                    default:
+                        setError(data.message || 'Failed to resend email. Please try again.');
+                }
+            } else if (error.request) {
+                setError('Network error. Please check your connection.');
+            } else {
+                setError('An unexpected error occurred. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -73,6 +131,7 @@ const ForgotPassword = () => {
                                 placeholder='Enter your email' 
                                 value={email} 
                                 onChange={handleEmailChange}
+                                disabled={loading}
                                 required
                             />
                             <button type='submit' disabled={loading}>
@@ -112,8 +171,10 @@ const ForgotPassword = () => {
                                     setEmailSent(false);
                                     setEmail('');
                                     setSuccess('');
+                                    setError('');
                                 }}
                                 className='back-button'
+                                disabled={loading}
                             >
                                 Back to Login
                             </button>
