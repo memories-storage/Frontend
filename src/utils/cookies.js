@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 const COOKIE_CONFIG = {
   // Auth token cookie
   AUTH_TOKEN: 'authToken',
+  REFRESH_TOKEN: 'refreshToken',
   USER_DATA: 'userData',
   
   // Cookie options
@@ -41,6 +42,23 @@ export const cookieUtils = {
     Cookies.remove(COOKIE_CONFIG.AUTH_TOKEN, { path: '/' });
   },
 
+  // Set refresh token
+  setRefreshToken: (token) => {
+    if (token) {
+      Cookies.set(COOKIE_CONFIG.REFRESH_TOKEN, token, COOKIE_CONFIG.OPTIONS);
+    }
+  },
+
+  // Get refresh token
+  getRefreshToken: () => {
+    return Cookies.get(COOKIE_CONFIG.REFRESH_TOKEN);
+  },
+
+  // Remove refresh token
+  removeRefreshToken: () => {
+    Cookies.remove(COOKIE_CONFIG.REFRESH_TOKEN, { path: '/' });
+  },
+
   // Set user data
   setUserData: (userData) => {
     if (userData) {
@@ -71,6 +89,7 @@ export const cookieUtils = {
   // Clear all auth cookies
   clearAuthCookies: () => {
     cookieUtils.removeAuthToken();
+    cookieUtils.removeRefreshToken();
     cookieUtils.removeUserData();
   },
 

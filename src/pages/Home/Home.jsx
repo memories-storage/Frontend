@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Button from '../../components/common/Button';
 import UserDashboard from '../../components/UserDashboard';
 import { useAuth } from '../../context/AuthContext';
+import { selectUserProfile } from '../../store/slices/userSlice';
 import './Home.css';
 
 const Home = () => {
@@ -11,6 +13,7 @@ const Home = () => {
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  const profile = useSelector(selectUserProfile);
 
   // Update time every second to show dynamic updates
   useEffect(() => {
@@ -35,6 +38,20 @@ const Home = () => {
     }
   };
 
+  // Helper function to get display name
+  const getDisplayName = () => {
+    if (profile?.firstName) {
+      return profile.firstName;
+    }
+    if (user?.firstName) {
+      return user.firstName;
+    }
+    if (user?.email) {
+      return user.email.split('@')[0]; // Use email prefix as fallback
+    }
+    return 'User';
+  };
+
   // If user is authenticated and wants to see profile, show it
   if (isAuthenticated && showProfile) {
     return <UserDashboard />;
@@ -46,7 +63,7 @@ const Home = () => {
       {isAuthenticated && (
         <div className="user-header">
           <div className="user-info">
-            <span>Welcome, {user?.firstName || user?.email || 'User'}!</span>
+            <span>Welcome, {getDisplayName()}!</span>
           </div>
         </div>
       )}
