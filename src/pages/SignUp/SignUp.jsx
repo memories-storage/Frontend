@@ -1,7 +1,8 @@
 import './SignUp.css';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';   
+import { useState, useEffect } from 'react';   
 import { useNavigate } from 'react-router-dom';
+
 
 const SignUp = () => {
     const [name, setName] = useState('');
@@ -22,10 +23,11 @@ const SignUp = () => {
         setLoading(true);
         setError('');
         setSuccess('');
-        if (name === 'admin' && email === 'admin@gmail.com' && password === 'admin') {
+        if (password === confirmPassword && name !== '' && email !== '' && password !== '') {
             navigate('/');
         } else {
             setError('Invalid name, email or password');
+            setLoading(false);
         }
     }
 

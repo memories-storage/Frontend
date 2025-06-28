@@ -18,10 +18,11 @@ const Login = () => {
         setLoading(true);
         setError('');
         setSuccess('');
-        if (email === 'admin@gmail.com' && password === 'admin') {
-            navigate('/admin');
+        if (email !== '' && password !== '') {
+            navigate('/');
         } else {
             setError('Invalid email or password');
+            setLoading(false);
         }
     }
 
