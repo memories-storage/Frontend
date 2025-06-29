@@ -18,7 +18,6 @@ const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState('');
-    const [passwordStrengthColor, setPasswordStrengthColor] = useState('');
     const navigate = useNavigate();
 
     const handleSignup = async (e) => {
@@ -138,13 +137,10 @@ const SignUp = () => {
     const handlePasswordStrength = (password) => {
         if (password.length < 8) {
             setPasswordStrength('Weak');
-            setPasswordStrengthColor('red');
         } else if (password.length < 12) {
             setPasswordStrength('Medium');
-            setPasswordStrengthColor('orange');
         } else {
             setPasswordStrength('Strong');
-            setPasswordStrengthColor('green');
         }
     }
 
