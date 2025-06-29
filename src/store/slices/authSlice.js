@@ -112,7 +112,7 @@ export const resetPassword = createAsyncThunk(
 
 const initialState = {
   user: null,
-  isAuthenticated: false,
+  isAuthenticated: !!cookieUtils.getAuthToken(), // Initialize from cookies
   loading: false,
   error: null,
   tokenRefreshLoading: false,
@@ -126,7 +126,9 @@ const authSlice = createSlice({
   reducers: {
     initializeAuth: (state) => {
       const token = cookieUtils.getAuthToken();
+      const userData = cookieUtils.getUserData();
       state.isAuthenticated = !!token;
+      state.user = userData;
       state.isInitialized = true;
     },
     clearAuthError: (state) => {
@@ -135,10 +137,6 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = true;
-    },
-    clearUser: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
     },
     clearAuthData: (state) => {
       state.user = null;

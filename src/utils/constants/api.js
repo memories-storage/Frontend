@@ -14,7 +14,7 @@ export const ENDPOINTS = {
   
   // User endpoints
   USERS: '/users',
-  USER_PROFILE: '/users/profile',
+  USER_PROFILE: '/getUserData',
   UPDATE_PROFILE: '/users/profile/update',
   CHANGE_PASSWORD: '/users/change-password',
   

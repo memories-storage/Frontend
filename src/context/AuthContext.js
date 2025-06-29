@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { authUtils } from '../utils/auth';
+import { selectIsAuthenticated, selectAuthUser, initializeAuth } from '../store/slices/authSlice';
 
 // Create Auth Context
 const AuthContext = createContext();
 
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
+  const dispatch = useDispatch();
+  const reduxIsAuthenticated = useSelector(selectIsAuthenticated);
+  const reduxUser = useSelector(selectAuthUser);
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,10 +30,20 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  // Initialize auth status
+  // Initialize auth status and sync with Redux
   useEffect(() => {
+    // Initialize Redux auth state
+    dispatch(initializeAuth());
+    
+    // Check local auth status
     checkAuthStatus();
-  }, []);
+  }, [dispatch]);
+
+  // Sync with Redux state changes
+  useEffect(() => {
+    setIsAuthenticated(reduxIsAuthenticated);
+    setUser(reduxUser);
+  }, [reduxIsAuthenticated, reduxUser]);
 
   // Login function
   const login = (token, userData) => {
