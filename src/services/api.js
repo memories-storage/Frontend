@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL, DEFAULT_HEADERS, API_TIMEOUT } from '../utils/constants/api';
+import { cookieUtils } from '../utils/cookies';
 
 // Create axios instance
 const api = axios.create({
@@ -12,7 +13,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('authToken');
+    const token = cookieUtils.getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -47,8 +48,8 @@ api.interceptors.response.use(
       
       switch (status) {
         case 401:
-          // Unauthorized - redirect to login
-          localStorage.removeItem('authToken');
+          // Unauthorized - clear cookies and redirect to login
+          cookieUtils.clearAuthCookies();
           window.location.href = '/login';
           break;
         case 403:
@@ -94,6 +95,22 @@ export const apiService = {
   post: async (url, data = {}, config = {}) => {
     try {
       const response = await api.post(url, data, config);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // POST form data
+  postForm: async (url, formData, config = {}) => {
+    try {
+      const response = await api.post(url, formData, {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       throw error;
