@@ -12,7 +12,6 @@ import {
 } from '../store/slices/userSlice';
 import {
   fetchProjects,
-  fetchProjectDetails,
   selectProjects,
   selectCurrentProject,
   selectProjectLoading,
