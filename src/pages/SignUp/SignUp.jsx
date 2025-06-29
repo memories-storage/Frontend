@@ -7,7 +7,8 @@ import { ENDPOINTS } from '../../utils/constants/api';
 import { cookieUtils } from '../../utils/cookies';
 
 const SignUp = () => {
-    const [name, setName] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,7 +28,8 @@ const SignUp = () => {
         setSuccess('');
 
         // Basic validation
-        if (!name.trim() || !email.trim() || !password || !confirmPassword) {
+        // last name is optional
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
             setError('Please fill in all fields');
             setLoading(false);
             return;
@@ -58,7 +60,10 @@ const SignUp = () => {
         try {
             // Create FormData object
             const formData = new FormData();
-            formData.append('name', name.trim());
+            formData.append('firstName', firstName.trim());
+            if (lastName.trim()) {
+                formData.append('lastName', lastName.trim());
+            }
             formData.append('email', email.trim());
             formData.append('password', password);
 
@@ -69,7 +74,8 @@ const SignUp = () => {
                 setSuccess(response.message || 'Registration successful! Redirecting to login...');
                 
                 // Clear form
-                setName('');
+                setFirstName('');
+                setLastName('');
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');
@@ -136,9 +142,16 @@ const SignUp = () => {
         if (error) setError('');
     }
 
-    const handleNameChange = (e) => {
-        const name = e.target.value;
-        setName(name);
+      const handleFirstNameChange = (e) => {
+        const firstName = e.target.value;
+        setFirstName(firstName);
+        // Clear error when user starts typing
+        if (error) setError('');
+    }
+
+    const handleLastNameChange = (e) => {
+        const lastName = e.target.value;
+        setLastName(lastName);
         // Clear error when user starts typing
         if (error) setError('');
     }
@@ -179,11 +192,19 @@ const SignUp = () => {
         <form onSubmit={handleSignup}>
           <input 
             type='text' 
-            placeholder='Name' 
-            value={name} 
-            onChange={handleNameChange}
+            placeholder='First Name' 
+            value={firstName} 
+            onChange={handleFirstNameChange}
             disabled={loading}
             required 
+          />
+          <input
+            type='text'
+            placeholder='Last Name'
+            value={lastName}
+            onChange={handleLastNameChange}
+            disabled={loading}
+            required
           />
           <input 
             type='email' 
