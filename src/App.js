@@ -12,6 +12,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import UserDashboard from './components/UserDashboard';
 import Settings from './components/Settings';
 import './styles/global.css';
+import UploadFile from './pages/UploadFile/UploadFile';
+import Scanner from './pages/Scanner';
 
 // Component to initialize auth state
 const AuthInitializer = () => {
@@ -39,7 +41,9 @@ function App() {
                   <Route path="/profile" element={<UserDashboard />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  {/* Add more routes here as you create more pages */}
+                  <Route path="/upload/:id" element={<UploadFile/>}/>
+                  <Route path="/scanner" element={<Scanner/>}/>
+                    {/* Add more routes here as you create more pages */}
                 </Routes>
               </main>
             </div>

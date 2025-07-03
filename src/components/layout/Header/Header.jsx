@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../context/ThemeContext';
 import { useAuth } from '../../../context/AuthContext';
 import Button from '../../common/Button';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import './Header.css';
 
 const Header = () => {
@@ -13,7 +14,7 @@ const Header = () => {
   const mobileMenuRef = useRef(null);
   const mobileMenuBtnRef = useRef(null);
   const userMenuRef = useRef(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -91,7 +92,7 @@ const Header = () => {
           
           <div className="header-logo">
             <Link to="/" onClick={closeMobileMenu}>
-              <h1>Let's Code</h1>
+              <h1>$</h1>
             </Link>
           </div>
           
@@ -104,14 +105,24 @@ const Header = () => {
             </ul>
           </nav>
           
-          <div className="header-actions">
+          <div
+           className="header-actions"
+           >
+            <Button 
+              variant="outline"
+              size="small"
+              className="scanner-toggle"
+              onClick={() => navigate('/scanner')} // For future use
+            >
+              <QrCodeScannerIcon />
+            </Button> 
             <Button 
               variant="outline" 
               size="small"
               onClick={toggleTheme}
               className="theme-toggle"
             >
-              {theme === 'light' ? '🌙' : '☀️'} {theme === 'light' ? 'Dark' : 'Light'}
+              {theme === 'light' ? '🌙' : '☀️'} 
             </Button>
             
             {/* Desktop Authentication */}
@@ -213,25 +224,7 @@ const Header = () => {
           {/* Mobile Authentication */}
           {isAuthenticated ? (
             <>
-              {/* <li className="mobile-user-info">
-                <div className="mobile-user-header">
-                  <div className="mobile-user-avatar">
-                    {user?.firstName ? user.firstName.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                  <div className="mobile-user-details">
-                    <span className="mobile-user-name">
-                      {user?.firstName && user?.lastName 
-                        ? `${user.firstName} ${user.lastName}` 
-                        : user?.firstName || 'User'
-                      }
-                    </span>
-                    <span className="mobile-user-email">{user?.email}</span>
-                  </div>
-                </div>
-              </li> */}
-              {/* <li><Link to="/profile" onClick={closeMobileMenu}>Profile</Link></li>
-              <li><Link to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link></li>
-              <li><Link to="/settings" onClick={closeMobileMenu}>Settings</Link></li> */}
+              
               <li className="mobile-auth-buttons">
                 <Button variant="outline" size="medium" fullWidth onClick={handleLogout}>
                   Logout

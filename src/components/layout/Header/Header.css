@@ -67,8 +67,7 @@
 
 .theme-toggle {
   min-width: auto;
-  padding: 6px 10px;
-  font-size: 12px;
+  display: none;
 }
 
 /* Mobile Menu Button */
@@ -201,6 +200,27 @@
   
   .header-actions-buttons {
     display: none;
+  }
+
+  .theme-toggle {
+    display: inline-flex !important;
+    width: 36px !important;
+    min-width: 0 !important;
+    max-width: 36px !important;
+    padding: 0 !important;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
+  .scanner-toggle {
+    display: inline-flex !important;
+    width: 36px !important;
+    min-width: 0 !important;
+    max-width: 36px !important;
+    padding: 0 !important;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
   }
 }
 
@@ -459,10 +479,6 @@
     gap: 10px;
   }
   
-  .theme-toggle {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
   
   .mobile-menu-btn {
     display: none;
