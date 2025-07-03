@@ -22,6 +22,9 @@ export const ENDPOINTS = {
   PROJECTS: '/projects',
   PROJECT_DETAILS: (id) => `/projects/${id}`,
   PROJECT_MEMBERS: (id) => `/projects/${id}/members`,
+
+  // File upload
+  UPLOAD_FILES: '/upload/files',
   
   // Code endpoints
   CODE_FILES: '/code/files',

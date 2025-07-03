@@ -1,104 +1,111 @@
 import React from 'react';
-import './Settings.css';
+import { Box, Paper, Typography, Button, Select, MenuItem, Stack, Divider } from '@mui/material';
 
 const Settings = () => {
+  const [theme, setTheme] = React.useState('light');
+  const [language, setLanguage] = React.useState('en');
+
   return (
-    <div className="settings">
-      <div className="settings-container">
-        <div className="settings-header">
-          <h1>Settings</h1>
-        </div>
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 4 }}>
+      <Box sx={{ maxWidth: 800, mx: 'auto', px: 2 }}>
+        <Paper elevation={3} sx={{ borderRadius: 3, mb: 4, p: 3, textAlign: 'center' }}>
+          <Typography variant="h4" fontWeight={700} color="primary.dark">Settings</Typography>
+        </Paper>
 
-        <div className="settings-content">
-          <div className="settings-section">
-            <h2>Account Settings</h2>
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Notifications</h3>
-                <p>Manage your notification preferences</p>
-              </div>
-              <div className="settings-action">
-                <button className="btn btn-outline">Configure</button>
-              </div>
-            </div>
+        <Stack spacing={4}>
+          {/* Account Settings */}
+          <Paper elevation={1} sx={{ borderRadius: 3, p: 3 }}>
+            <Typography variant="h5" fontWeight={600} gutterBottom>Account Settings</Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Stack spacing={3}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Notifications</Typography>
+                  <Typography variant="body2" color="text.secondary">Manage your notification preferences</Typography>
+                </Box>
+                <Button variant="outlined">Configure</Button>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Privacy</Typography>
+                  <Typography variant="body2" color="text.secondary">Control your privacy settings</Typography>
+                </Box>
+                <Button variant="outlined">Manage</Button>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Security</Typography>
+                  <Typography variant="body2" color="text.secondary">Two-factor authentication and security settings</Typography>
+                </Box>
+                <Button variant="outlined">Setup</Button>
+              </Stack>
+            </Stack>
+          </Paper>
 
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Privacy</h3>
-                <p>Control your privacy settings</p>
-              </div>
-              <div className="settings-action">
-                <button className="btn btn-outline">Manage</button>
-              </div>
-            </div>
+          {/* App Settings */}
+          <Paper elevation={1} sx={{ borderRadius: 3, p: 3 }}>
+            <Typography variant="h5" fontWeight={600} gutterBottom>App Settings</Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Stack spacing={3}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Theme</Typography>
+                  <Typography variant="body2" color="text.secondary">Choose your preferred theme</Typography>
+                </Box>
+                <Select
+                  value={theme}
+                  onChange={e => setTheme(e.target.value)}
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                >
+                  <MenuItem value="light">Light</MenuItem>
+                  <MenuItem value="dark">Dark</MenuItem>
+                  <MenuItem value="auto">Auto</MenuItem>
+                </Select>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Language</Typography>
+                  <Typography variant="body2" color="text.secondary">Select your preferred language</Typography>
+                </Box>
+                <Select
+                  value={language}
+                  onChange={e => setLanguage(e.target.value)}
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                >
+                  <MenuItem value="en">English</MenuItem>
+                  <MenuItem value="es">Spanish</MenuItem>
+                  <MenuItem value="fr">French</MenuItem>
+                </Select>
+              </Stack>
+            </Stack>
+          </Paper>
 
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Security</h3>
-                <p>Two-factor authentication and security settings</p>
-              </div>
-              <div className="settings-action">
-                <button className="btn btn-outline">Setup</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="settings-section">
-            <h2>App Settings</h2>
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Theme</h3>
-                <p>Choose your preferred theme</p>
-              </div>
-              <div className="settings-action">
-                <select className="form-select">
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                  <option value="auto">Auto</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Language</h3>
-                <p>Select your preferred language</p>
-              </div>
-              <div className="settings-action">
-                <select className="form-select">
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="settings-section">
-            <h2>Data & Storage</h2>
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Export Data</h3>
-                <p>Download your data</p>
-              </div>
-              <div className="settings-action">
-                <button className="btn btn-outline">Export</button>
-              </div>
-            </div>
-
-            <div className="settings-item">
-              <div className="settings-info">
-                <h3>Clear Cache</h3>
-                <p>Clear cached data to free up space</p>
-              </div>
-              <div className="settings-action">
-                <button className="btn btn-outline">Clear</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          {/* Data & Storage */}
+          <Paper elevation={1} sx={{ borderRadius: 3, p: 3 }}>
+            <Typography variant="h5" fontWeight={600} gutterBottom>Data & Storage</Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Stack spacing={3}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Export Data</Typography>
+                  <Typography variant="body2" color="text.secondary">Download your data</Typography>
+                </Box>
+                <Button variant="outlined">Export</Button>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>Clear Cache</Typography>
+                  <Typography variant="body2" color="text.secondary">Clear cached data to free up space</Typography>
+                </Box>
+                <Button variant="outlined">Clear</Button>
+              </Stack>
+            </Stack>
+          </Paper>
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 
