@@ -76,7 +76,7 @@ const UploadFile = () => {
       if (typeof id === 'string' && id.includes('=')) {
         cleanId = id.split('=')[1];
       }
-      formData.append('id', cleanId);
+      formData.append('userId', cleanId);
     }
 
     // Print FormData content
@@ -125,43 +125,47 @@ const UploadFile = () => {
   return (
     <div className="uploadfile-root">
       <h2 className="uploadfile-title">Upload Files</h2>
-      <div className="uploadfile-input-row">
+      <div className="uploadfile-header-row">
         <input type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="uploadfile-input" />
+        <button onClick={handleUpload} disabled={uploading || !files.some(f => f.checked)} className="uploadfile-uploadbtn">
+          {uploading ? 'Uploading...' : 'Upload Selected'}
+        </button>
+      </div>
+      <div className="uploadfile-count-row">
         <span className="uploadfile-count">{files.length} file{files.length !== 1 ? 's' : ''} selected</span>
       </div>
-      <div className="uploadfile-cards">
-        {files.map((f, idx) => (
-          <div key={idx} className={`uploadfile-card${f.checked ? ' checked' : ''}`}>
-            <button className="uploadfile-removebtn" title="Remove file" onClick={() => handleRemove(idx)}>&times;</button>
-            <input type="checkbox" checked={f.checked} onChange={() => handleCheck(idx)} className="uploadfile-checkbox" />
-            <div className="uploadfile-media-container">
-              {isImage(f.file) && f.previewUrl && (
-                <img src={f.previewUrl} alt={f.file.name} className="css-1kuwa16-MuiCardMedia-root uploadfile-media" />
+      <div className="uploadfile-cards-scroll">
+        <div className="uploadfile-cards">
+          {files.map((f, idx) => (
+            <div key={idx} className={`uploadfile-card${f.checked ? ' checked' : ''}`}>
+              <button className="uploadfile-removebtn" title="Remove file" onClick={() => handleRemove(idx)}>&times;</button>
+              <input type="checkbox" checked={f.checked} onChange={() => handleCheck(idx)} className="uploadfile-checkbox" />
+              <div className="uploadfile-media-container">
+                {isImage(f.file) && f.previewUrl && (
+                  <img src={f.previewUrl} alt={f.file.name} className="css-1kuwa16-MuiCardMedia-root uploadfile-media" />
+                )}
+                {isVideo(f.file) && f.previewUrl && (
+                  <video src={f.previewUrl} controls className="css-1kuwa16-MuiCardMedia-root uploadfile-media" />
+                )}
+                {!isImage(f.file) && !isVideo(f.file) && (
+                  <span className="uploadfile-nopreview">No preview</span>
+                )}
+              </div>
+              <div className="uploadfile-filename">{f.file.name}</div>
+              <div className="uploadfile-filesize">{(f.file.size/1024).toFixed(1)} KB</div>
+              {f.status === 'success' && (
+                <div className="uploadfile-status-success">Uploaded</div>
               )}
-              {isVideo(f.file) && f.previewUrl && (
-                <video src={f.previewUrl} controls className="css-1kuwa16-MuiCardMedia-root uploadfile-media" />
+              {f.status === 'error' && (
+                <div className="uploadfile-status-error">Failed: {f.error}</div>
               )}
-              {!isImage(f.file) && !isVideo(f.file) && (
-                <span className="uploadfile-nopreview">No preview</span>
+              {f.status === 'pending' && (
+                <div className="uploadfile-status-pending">Pending upload</div>
               )}
             </div>
-            <div className="uploadfile-filename">{f.file.name}</div>
-            <div className="uploadfile-filesize">{(f.file.size/1024).toFixed(1)} KB</div>
-            {f.status === 'success' && (
-              <div className="uploadfile-status-success">Uploaded</div>
-            )}
-            {f.status === 'error' && (
-              <div className="uploadfile-status-error">Failed: {f.error}</div>
-            )}
-            {f.status === 'pending' && (
-              <div className="uploadfile-status-pending">Pending upload</div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-      <button onClick={handleUpload} disabled={uploading || !files.some(f => f.checked)} className="uploadfile-uploadbtn">
-        {uploading ? 'Uploading...' : 'Upload Selected'}
-      </button>
       <div className="uploadfile-message">{message}</div>
     </div>
   );
