@@ -17,14 +17,6 @@
   letter-spacing: 1px;
 }
 
-.uploadfile-input-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
 .uploadfile-input {
   margin-bottom: 0;
   padding: 8px 12px;
