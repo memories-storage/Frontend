@@ -108,69 +108,101 @@ const UploadFile = () => {
   React.useEffect(() => {
     if (uploadResult) {
       // Handle new structured response format
-      if (uploadResult.successful !== undefined && uploadResult.failed !== undefined && uploadResult.failed !== null) {
-        const failedCount = uploadResult.failed.length;
+      if (uploadResult.successful !== undefined && uploadResult.failed !== undefined) {
+        // Ensure arrays are not null
+        const successfulArray = Array.isArray(uploadResult.successful) ? uploadResult.successful : [];
+        const failedArray = Array.isArray(uploadResult.failed) ? uploadResult.failed : [];
         
-        setMessage(failedCount === 0 ? 'All files uploaded successfully.' : `${failedCount} file(s) failed to upload.`);
+        const failedCount = failedArray.length;
+        const successfulCount = successfulArray.length;
+        
+        if (failedCount === 0) {
+          setMessage(`All ${successfulCount} file(s) uploaded successfully.`);
+        } else {
+          setMessage(`${successfulCount} file(s) uploaded successfully, ${failedCount} file(s) failed.`);
+        }
         
         // Update file statuses and remove successful files immediately
         setFiles(prevFiles => {
-          return prevFiles.filter(file => {
-            const isFailed = uploadResult.failed.some(failedFile => 
-              failedFile.name === file.file.name
-            );
+          console.log('=== UPLOAD RESULT DEBUG ===');
+          console.log('Processing files:', prevFiles.length);
+          console.log('Successful files from backend:', successfulArray);
+          console.log('Failed files from backend:', failedArray);
+          console.log('Current files in state:', prevFiles.map(f => ({ name: f.file.name, uuid: f.uuid, fullName: f.uuid + '_' + f.file.name, checked: f.checked })));
+          
+          const filtered = prevFiles.filter(file => {
+            const fullName = file.uuid + '_' + file.file.name;
+            const isFailed = failedArray.some(failedFile => {
+              const match = failedFile.name === fullName;
+              console.log(`Checking failed: "${failedFile.name}" === "${fullName}" = ${match}`);
+              return match;
+            });
+            const isSuccessful = successfulArray.some(successfulFile => {
+              const match = successfulFile.name === fullName;
+              console.log(`Checking successful: "${successfulFile.name}" === "${fullName}" = ${match}`);
+              return match;
+            });
+            
+            console.log(`File ${file.file.name} (full: ${fullName}): isFailed=${isFailed}, isSuccessful=${isSuccessful}, checked=${file.checked}`);
             
             if (isFailed) {
               // Keep failed files with error status
+              console.log(`Keeping failed file: ${file.file.name}`);
               return true;
-            } else if (file.checked) {
-              // Remove successful files immediately
+            } else if (isSuccessful) {
+              // Remove successful files immediately (regardless of checked status)
+              console.log(`Removing successful file: ${file.file.name}`);
               return false;
             }
-            // Keep unchecked files
+            // Keep unchecked files that weren't uploaded
+            console.log(`Keeping unchecked file: ${file.file.name}`);
             return true;
           }).map(file => {
-            const isFailed = uploadResult.failed.some(failedFile => 
-              failedFile.name === file.file.name
+            const fullName = file.uuid + '_' + file.file.name;
+            const isFailed = failedArray.some(failedFile => 
+              failedFile.name === fullName
             );
-            
             if (isFailed) {
               return { ...file, status: 'error', error: 'Upload failed' };
             }
             return file;
           });
+          console.log('Files after processing:', filtered.length, filtered.map(f => f.file.name));
+          console.log('=== END DEBUG ===');
+          return filtered;
         });
         
         dispatch(clearUploadResult());
       } else if (Array.isArray(uploadResult)) {
         // Handle old response format (array of failed files only)
+        const failedCount = uploadResult.length;
         
-        if(uploadResult.failed===undefined || uploadResult.failed===null || uploadResult.failed.length===0){
+        if (failedCount === 0) {
           setMessage('All files uploaded successfully.');
         } else {
-          setMessage(`${uploadResult.failed.length} file(s) failed to upload.`);
+          setMessage(`${failedCount} file(s) failed to upload.`);
         }
         
         // Update file statuses and remove successful files immediately
         setFiles(prevFiles => {
           return prevFiles.filter(file => {
-            const isFailed = uploadResult.some(failedFile => 
+            const isFailed = uploadResult?.some(failedFile => 
               failedFile.name === file.file.name
-            );
+            ) || false;
             
             if (isFailed) {
               // Keep failed files with error status
               return true;
             } else if (file.checked) {
-              // Remove successful files immediately
+              // Remove successful files immediately (in old format, if not in failed array, it's successful)
               return false;
             }
             // Keep unchecked files
             return true;
           }).map(file => {
-            const isFailed = uploadResult.some(failedFile => 
+            const isFailed = uploadResult?.some(failedFile => 
               failedFile.name === file.file.name
-            );
+            ) || false;
             
             if (isFailed) {
               return { ...file, status: 'error', error: 'Upload failed' };
@@ -182,6 +214,7 @@ const UploadFile = () => {
         dispatch(clearUploadResult());
       } else {
         // Handle unexpected response format
+        console.error('Unexpected upload response format:', uploadResult);
         setMessage('Upload completed with unexpected response.');
         dispatch(clearUploadResult());
       }
