@@ -14,10 +14,18 @@ const Scanner = () => {
   React.useEffect(() => {
     const loadQrScanner = async () => {
       try {
+        // Check if we're in a secure context (HTTPS or localhost)
+        if (!window.isSecureContext) {
+          console.warn('QR Scanner requires a secure context (HTTPS or localhost)');
+          setCameraAvailable(false);
+          return;
+        }
+        
         const QrScanner = await import('react-qr-scanner');
         setQrScannerComponent(() => QrScanner.default);
         setCameraAvailable(true);
       } catch (error) {
+        console.error('Failed to load QR scanner:', error);
         setCameraAvailable(false);
       }
     };
@@ -45,11 +53,16 @@ const Scanner = () => {
   };
 
   const handleError = (err) => {
+    console.log('QR Scanner Error:', err);
     if (err.name === 'NotAllowedError') {
       setCameraPermission('denied');
       setQrResult('📱 Camera access denied. Please allow camera permissions to use the scanner.');
     } else if (err.name === 'NotFoundError') {
       setQrResult('📷 No camera found on this device. Please use image upload instead.');
+    } else if (err.name === 'NotSupportedError') {
+      setQrResult('⚠️ Camera not supported in this browser. Please use image upload instead.');
+    } else if (err.name === 'NotReadableError') {
+      setQrResult('⚠️ Camera is already in use by another application. Please close other camera apps and try again.');
     } else {
       setQrResult('⚠️ Camera error: ' + (err.message || 'Unknown error'));
     }
