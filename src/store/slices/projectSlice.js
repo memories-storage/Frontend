@@ -162,6 +162,10 @@ const projectSlice = createSlice({
         );
       }
     },
+    clearUploadResult: (state) => {
+      state.uploadResult = null;
+      state.uploadError = null;
+    },
   },
   extraReducers: (builder) => {
     // Fetch Projects
@@ -338,6 +342,7 @@ export const {
   removeProjectLocally,
   addProjectMemberLocally,
   removeProjectMemberLocally,
+  clearUploadResult,
 } = projectSlice.actions;
 
 export default projectSlice.reducer; 

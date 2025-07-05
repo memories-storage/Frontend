@@ -31,20 +31,13 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    // Log response time
-    const endTime = new Date();
-    const startTime = response.config.metadata.startTime;
-    const duration = endTime - startTime;
-    
-    console.log(`API Request: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status} (${duration}ms)`);
-    
     return response;
   },
   (error) => {
     // Handle common errors
     if (error.response) {
       // Server responded with error status
-      const { status, data } = error.response;
+      const { status } = error.response;
       
       switch (status) {
         case 401:
@@ -54,25 +47,20 @@ api.interceptors.response.use(
           break;
         case 403:
           // Forbidden - show access denied message
-          console.error('Access denied');
           break;
         case 404:
           // Not found
-          console.error('Resource not found');
           break;
         case 500:
           // Server error
-          console.error('Server error occurred');
           break;
         default:
-          console.error(`API Error: ${status} - ${data?.message || 'Unknown error'}`);
+          // Handle other errors
       }
     } else if (error.request) {
       // Network error
-      console.error('Network error - no response received');
     } else {
       // Other error
-      console.error('Request setup error:', error.message);
     }
     
     return Promise.reject(error);
