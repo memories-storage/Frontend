@@ -1,47 +1,73 @@
 import React, { useState, useRef } from 'react';
-import QrScanner from 'react-qr-scanner';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
   const [qrResult, setQrResult] = useState(null);
-  const [cameraAvailable, setCameraAvailable] = useState(true);
+  const [cameraAvailable, setCameraAvailable] = useState(false);
+  const [QrScannerComponent, setQrScannerComponent] = useState(null);
   const fileInputRef = useRef(null);
   const [hasRedirected, setHasRedirected] = useState(false);
 
-  // Check for camera availability
+  // Load QR scanner component dynamically
   React.useEffect(() => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setCameraAvailable(false);
-    } else {
-      navigator.mediaDevices.enumerateDevices().then(devices => {
-        const hasCamera = devices.some(device => device.kind === 'videoinput');
-        setCameraAvailable(hasCamera);
-      });
-    }
+    const loadQrScanner = async () => {
+      try {
+        const QrScanner = await import('react-qr-scanner');
+        setQrScannerComponent(() => QrScanner.default);
+        
+        // Check for camera availability
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.enumerateDevices().then(devices => {
+            const hasCamera = devices.some(device => device.kind === 'videoinput');
+            setCameraAvailable(hasCamera);
+          }).catch(() => {
+            setCameraAvailable(false);
+          });
+        } else {
+          setCameraAvailable(false);
+        }
+      } catch (error) {
+        console.warn('react-qr-scanner not available, camera scanning disabled');
+        setCameraAvailable(false);
+      }
+    };
+    
+    loadQrScanner();
   }, []);
 
   // Handle QR code from image
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new window.Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-        const code = jsQR(imageData.data, img.width, img.height);
-        if (code) {
-          setQrResult(code.data);
-        } else {
-          setQrResult('No QR code found in image.');
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+          const imageData = ctx.getImageData(0, 0, img.width, img.height);
+          const code = jsQR(imageData.data, img.width, img.height);
+          if (code) {
+            setQrResult(code.data);
+          } else {
+            setQrResult('No QR code found in image.');
+          }
+        } catch (error) {
+          setQrResult('Error processing image: ' + error.message);
         }
       };
+      img.onerror = () => {
+        setQrResult('Error loading image.');
+      };
       img.src = e.target.result;
+    };
+    reader.onerror = () => {
+      setQrResult('Error reading file.');
     };
     reader.readAsDataURL(file);
   };
@@ -62,40 +88,63 @@ const Scanner = () => {
   };
 
   const handleError = (err) => {
-    setQrResult('Camera error: ' + err.message);
+    console.error('QR Scanner error:', err);
+    setQrResult('Camera error: ' + (err.message || 'Unknown error'));
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto', textAlign: 'center' }}>
+    <div style={{ maxWidth: 400, margin: '0 auto', textAlign: 'center', padding: '20px' }}>
       <h2>QR Code Scanner</h2>
-      {cameraAvailable ? (
+      
+      {cameraAvailable && QrScannerComponent ? (
         <div style={{ marginBottom: 20 }}>
-          <QrScanner
+          <QrScannerComponent
             delay={300}
             onError={handleError}
             onScan={handleScan}
             videoConstraints={{
               facingMode: 'environment'
             }}
-            style={{ width: '100%' }}
+            style={{ width: '100%', maxWidth: '300px' }}
           />
         </div>
       ) : (
-        <p>Camera not available on this device.</p>
+        <div style={{ marginBottom: 20, padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+          <p>Camera scanning is not available on this device.</p>
+          <p style={{ fontSize: '14px', color: '#666' }}>You can still upload images to scan QR codes.</p>
+        </div>
       )}
+      
       <div style={{ margin: '20px 0' }}>
         <input
           type="file"
           accept="image/*"
           ref={fileInputRef}
           onChange={handleImageUpload}
+          style={{ marginBottom: '10px' }}
         />
-        <p>Or upload an image to scan QR code</p>
+        <p style={{ fontSize: '14px', color: '#666' }}>Upload an image to scan QR code</p>
       </div>
-      <div>
-        <strong>Result:</strong>
-        <div style={{ wordBreak: 'break-all', marginTop: 10 }}>{qrResult || 'No result yet.'}</div>
-      </div>
+      
+      {qrResult && (
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '15px', 
+          backgroundColor: '#f9f9f9', 
+          borderRadius: '8px',
+          border: '1px solid #ddd'
+        }}>
+          <strong>Result:</strong>
+          <div style={{ 
+            wordBreak: 'break-all', 
+            marginTop: 10, 
+            fontSize: '14px',
+            fontFamily: 'monospace'
+          }}>
+            {qrResult}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
