@@ -43,8 +43,6 @@ const ForgotPassword = () => {
             setEmailSent(true);
             setSuccess(response.message || 'Password reset link has been sent to your email address');
         } catch (error) {
-            console.error('Forgot password error:', error);
-            
             // Handle different types of errors
             if (error.response) {
                 const { status, data } = error.response;
@@ -91,7 +89,7 @@ const ForgotPassword = () => {
 
             setSuccess(response.message || 'Reset link has been resent to your email');
         } catch (error) {
-            console.error('Resend email error:', error);
+      
             
             if (error.response) {
                 const { status, data } = error.response;

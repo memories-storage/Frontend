@@ -48,8 +48,6 @@ const Login = () => {
 
             // Handle successful login
             if (response.token) {
-                console.log(response);
-                
                 // Use the login function from AuthContext
                 login(response.token, response.user);
 
@@ -63,7 +61,7 @@ const Login = () => {
                 setError('Invalid response from server');
             }
         } catch (error) {
-            console.error('Login error:', error);
+      
             
             // Handle different types of errors
             if (error.response) {

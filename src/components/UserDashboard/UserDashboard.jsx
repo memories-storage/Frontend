@@ -296,7 +296,7 @@ const UserDashboard = () => {
       // Also call context logout
       logout();
     } catch (error) {
-      console.error('Logout failed:', error);
+
       // Fallback to context logout
       logout();
     }

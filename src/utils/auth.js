@@ -37,7 +37,7 @@ export const authUtils = {
       
       return payload.exp < currentTime;
     } catch (error) {
-      console.error('Error checking token expiration:', error);
+  
       return true;
     }
   },

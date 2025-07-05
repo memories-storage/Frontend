@@ -88,8 +88,6 @@ const SignUp = () => {
                 setError('Invalid response from server');
             }
         } catch (error) {
-            console.error('Signup error:', error);
-            
             // Handle different types of errors
             if (error.response) {
                 const { status, data } = error.response;

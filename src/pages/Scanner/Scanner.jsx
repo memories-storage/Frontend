@@ -5,6 +5,7 @@ const Scanner = () => {
   const [qrResult, setQrResult] = useState(null);
   const [cameraAvailable, setCameraAvailable] = useState(false);
   const [QrScannerComponent, setQrScannerComponent] = useState(null);
+  const [cameraPermission, setCameraPermission] = useState('prompt'); // 'prompt', 'granted', 'denied'
   const fileInputRef = useRef(null);
   const [hasRedirected, setHasRedirected] = useState(false);
 
@@ -15,19 +16,30 @@ const Scanner = () => {
         const QrScanner = await import('react-qr-scanner');
         setQrScannerComponent(() => QrScanner.default);
         
-        // Check for camera availability
+        // Check for camera availability and permissions
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          navigator.mediaDevices.enumerateDevices().then(devices => {
-            const hasCamera = devices.some(device => device.kind === 'videoinput');
-            setCameraAvailable(hasCamera);
-          }).catch(() => {
-            setCameraAvailable(false);
-          });
+          // Check if we have permission to access camera
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            stream.getTracks().forEach(track => track.stop()); // Stop the stream immediately
+            setCameraPermission('granted');
+            setCameraAvailable(true);
+          } catch (permissionError) {
+    
+            if (permissionError.name === 'NotAllowedError') {
+              setCameraPermission('denied');
+              setCameraAvailable(false);
+            } else if (permissionError.name === 'NotFoundError') {
+              setCameraAvailable(false);
+            } else {
+              setCameraAvailable(false);
+            }
+          }
         } else {
           setCameraAvailable(false);
         }
       } catch (error) {
-        console.warn('react-qr-scanner not available, camera scanning disabled');
+
         setCameraAvailable(false);
       }
     };
@@ -75,10 +87,24 @@ const Scanner = () => {
   // Handle QR code from camera
   const handleScan = (data) => {
     if (data && !hasRedirected) {
-      setQrResult(data);
+      // Extract the text from the QR code result
+      let qrText;
+      if (typeof data === 'string') {
+        qrText = data;
+      } else if (data && typeof data === 'object' && data.text) {
+        qrText = data.text;
+      } else if (data && typeof data === 'object' && data.data) {
+        qrText = data.data;
+      } else {
+
+        qrText = JSON.stringify(data);
+      }
+      
+      setQrResult(qrText);
+      
       // If the scanned data is a valid URL, redirect
       try {
-        const url = new URL(data);
+        const url = new URL(qrText);
         setHasRedirected(true);
         window.location.href = url.href;
       } catch (e) {
@@ -88,15 +114,39 @@ const Scanner = () => {
   };
 
   const handleError = (err) => {
-    console.error('QR Scanner error:', err);
-    setQrResult('Camera error: ' + (err.message || 'Unknown error'));
+    
+    
+    if (err.name === 'NotAllowedError') {
+      setCameraPermission('denied');
+      setQrResult('Camera access denied. Please allow camera permissions in your browser settings.');
+    } else if (err.name === 'NotFoundError') {
+      setQrResult('No camera found on this device.');
+    } else if (err.name === 'NotSupportedError') {
+      setQrResult('Camera not supported on this device.');
+    } else {
+      setQrResult('Camera error: ' + (err.message || 'Unknown error'));
+    }
+  };
+
+  // Function to request camera permission
+  const requestCameraPermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(track => track.stop());
+      setCameraPermission('granted');
+      setCameraAvailable(true);
+    } catch (error) {
+      
+      setCameraPermission('denied');
+      setQrResult('Camera permission denied. Please allow camera access in your browser settings.');
+    }
   };
 
   return (
     <div style={{ maxWidth: 400, margin: '0 auto', textAlign: 'center', padding: '20px' }}>
       <h2>QR Code Scanner</h2>
       
-      {cameraAvailable && QrScannerComponent ? (
+      {cameraAvailable && QrScannerComponent && cameraPermission === 'granted' ? (
         <div style={{ marginBottom: 20 }}>
           <QrScannerComponent
             delay={300}
@@ -107,6 +157,26 @@ const Scanner = () => {
             }}
             style={{ width: '100%', maxWidth: '300px' }}
           />
+        </div>
+      ) : cameraPermission === 'denied' ? (
+        <div style={{ marginBottom: 20, padding: '20px', backgroundColor: '#fff3cd', borderRadius: '8px', border: '1px solid #ffeaa7' }}>
+          <p style={{ color: '#856404', marginBottom: '10px' }}>Camera access denied</p>
+          <p style={{ fontSize: '14px', color: '#856404', marginBottom: '15px' }}>
+            Please allow camera permissions in your browser settings to use the scanner.
+          </p>
+          <button 
+            onClick={requestCameraPermission}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Try Again
+          </button>
         </div>
       ) : (
         <div style={{ marginBottom: 20, padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
