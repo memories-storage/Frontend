@@ -75,6 +75,18 @@ export const fetchProjectMembers = createAsyncThunk(
   }
 );
 
+export const uploadFiles = createAsyncThunk(
+  'project/uploadFiles',
+  async ({ formData }, { rejectWithValue }) => {
+    try {
+      const response = await apiService.postForm(ENDPOINTS.UPLOAD_FILES, formData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to upload files');
+    }
+  }
+);
+
 const initialState = {
   projects: [],
   currentProject: null,
@@ -86,6 +98,9 @@ const initialState = {
     currentProject: null,
   },
   cacheDuration: 10 * 60 * 1000, // 10 minutes
+  uploading: false,
+  uploadError: null,
+  uploadResult: null,
 };
 
 const projectSlice = createSlice({
@@ -265,6 +280,24 @@ const projectSlice = createSlice({
       .addCase(fetchProjectMembers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      });
+
+    // Upload Files
+    builder
+      .addCase(uploadFiles.pending, (state) => {
+        state.uploading = true;
+        state.uploadError = null;
+        state.uploadResult = null;
+      })
+      .addCase(uploadFiles.fulfilled, (state, action) => {
+        state.uploading = false;
+        state.uploadResult = action.payload;
+        state.uploadError = null;
+      })
+      .addCase(uploadFiles.rejected, (state, action) => {
+        state.uploading = false;
+        state.uploadError = action.payload;
+        state.uploadResult = null;
       });
   },
 });

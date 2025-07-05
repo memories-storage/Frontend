@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { API_BASE_URL, ENDPOINTS } from '../../utils/constants/api';
 import { useParams } from 'react-router-dom';
 import './UploadFile.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadFiles } from '../../store/slices/projectSlice';
 
 const getDeviceInfo = () => {
   return {
@@ -20,9 +21,12 @@ const isVideo = (file) => file.type.startsWith('video/');
 
 const UploadFile = () => {
   const [files, setFiles] = useState([]); // [{file, status, error, checked, previewUrl}]
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const uploading = useSelector(state => state.project.uploading);
+  const uploadError = useSelector(state => state.project.uploadError);
+  const uploadResult = useSelector(state => state.project.uploadResult);
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files).map(file => ({
@@ -63,64 +67,48 @@ const UploadFile = () => {
       setMessage('Please select at least one file to upload.');
       return;
     }
-    setUploading(true);
     setMessage('Uploading files to backend...');
     const formData = new FormData();
-    filesToUpload.forEach((f, idx) => {
+    filesToUpload.forEach((f) => {
       formData.append('files', f.file);
     });
     const deviceInfo = getDeviceInfo();
     formData.append('deviceInfo', JSON.stringify(deviceInfo));
     if (id) {
-      let cleanId = id;
-      if (typeof id === 'string' && id.includes('=')) {
-        cleanId = id.split('=')[1];
-      }
-      formData.append('userId', cleanId);
+      formData.append('userId', id.split('=')[1]);
     }
-
-    // Print FormData content
-    console.log('Uploading files and device info to backend:');
-    for (let pair of formData.entries()) {
-      if (pair[0] === 'files') {
-        console.log('File:', pair[1].name, pair[1].size, pair[1].type);
-      } else {
-        console.log(pair[0] + ':', pair[1]);
-      }
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}${ENDPOINTS.UPLOAD_FILES}`, {
-        method: 'POST',
-        body: formData
-      });
-      if (res.ok) {
-        const data = await res.json();
-        // Assume backend returns an array of {name, status, error?}
-        const updatedFiles = files.map(f => {
-          if (!f.checked) return f;
-          const result = data.results?.find(r => r.name === f.file.name);
-          if (result) {
-            return {
-              ...f,
-              status: result.status,
-              error: result.error || ''
-            };
-          }
-          return { ...f, status: 'error', error: 'No response from backend' };
-        });
-        setFiles(updatedFiles);
-        setMessage('Upload complete.');
-      } else {
-        setFiles(files.map(f => f.checked ? { ...f, status: 'error', error: 'Backend error' } : f));
-        setMessage('Failed to upload files to backend.');
-      }
-    } catch (err) {
-      setFiles(files.map(f => f.checked ? { ...f, status: 'error', error: err.message } : f));
-      setMessage('Error uploading to backend: ' + err.message);
-    }
-    setUploading(false);
+    
+    dispatch(uploadFiles({ formData }));
   };
+
+  // Show upload result or error
+  React.useEffect(() => {
+    if (uploadResult) {
+      // Handle the original response format (array of ImageResponse objects)
+      if (Array.isArray(uploadResult) && uploadResult.length > 0) {
+        setMessage(`Successfully uploaded ${uploadResult.length} file(s).`);
+        
+        // Update file statuses based on upload result
+        setFiles(prevFiles => {
+          return prevFiles.map(file => {
+            const uploadedFile = uploadResult.find(upload => 
+              upload.URL && upload.URL.includes(file.file.name.split('.')[0])
+            );
+            if (uploadedFile) {
+              return { ...file, status: 'success' };
+            }
+            return file;
+          });
+        });
+      } else if (Array.isArray(uploadResult) && uploadResult.length === 0) {
+        setMessage('No files were successfully uploaded.');
+      } else {
+        setMessage('Upload completed.');
+      }
+    } else if (uploadError) {
+      setMessage('Failed to upload files to backend.');
+    }
+  }, [uploadResult, uploadError]);
 
   return (
     <div className="uploadfile-root">
