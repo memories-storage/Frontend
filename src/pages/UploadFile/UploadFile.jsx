@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import './UploadFile.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadFiles, clearUploadResult } from '../../store/slices/projectSlice';
 import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '../../context/AuthContext';
 
 const getDeviceInfo = () => {
   return {
@@ -24,10 +25,32 @@ const UploadFile = () => {
   const [files, setFiles] = useState([]); // [{file, status, error, checked, previewUrl, uuid}]
   const [message, setMessage] = useState('');
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const dispatch = useDispatch();
   const uploading = useSelector(state => state.project.uploading);
   const uploadError = useSelector(state => state.project.uploadError);
   const uploadResult = useSelector(state => state.project.uploadResult);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setMessage('Please log in to upload files.');
+      navigate('/login');
+      return;
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Get user ID from auth context or URL params
+  const getUserId = () => {
+    if (id) {
+      // Extract user ID from URL parameter (format: userId=123)
+      const userIdMatch = id.match(/userId=([^&]+)/);
+      return userIdMatch ? userIdMatch[1] : null;
+    }
+    // Use user ID from auth context
+    return user?.id || user?.userId;
+  };
   
 
 
@@ -67,6 +90,12 @@ const UploadFile = () => {
   };
 
   const handleUpload = async () => {
+    if (!isAuthenticated) {
+      setMessage('Please log in to upload files.');
+      navigate('/login');
+      return;
+    }
+
     const filesToUpload = files.filter(f => f.checked);
     if (!filesToUpload.length) {
       setMessage('Please select at least one file to upload.');
@@ -97,8 +126,13 @@ const UploadFile = () => {
     
     const deviceInfo = getDeviceInfo();
     formData.append('deviceInfo', JSON.stringify(deviceInfo));
-    if (id) {
-      formData.append('userId', id.split('=')[1]);
+    
+    const userId = getUserId();
+    if (userId) {
+      formData.append('userId', userId);
+    } else {
+      setMessage('Error: User ID not found. Please log in again.');
+      return;
     }
     
     dispatch(uploadFiles({ formData }));
@@ -229,6 +263,21 @@ const UploadFile = () => {
       dispatch(clearUploadResult());
     }
   }, [uploadResult, uploadError, dispatch]);
+
+  // Show authentication message if not logged in
+  if (!isAuthenticated) {
+    return (
+      <div className="uploadfile-root">
+        <h2 className="uploadfile-title">Upload Files</h2>
+        <div className="auth-message">
+          <p>You need to be logged in to upload files.</p>
+          <button onClick={() => navigate('/login')} className="login-button">
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="uploadfile-root">
