@@ -87,18 +87,6 @@ export const uploadFiles = createAsyncThunk(
   }
 );
 
-export const uploadFilesToUser = createAsyncThunk(
-  'project/uploadFilesToUser',
-  async ({ formData, userId }, { rejectWithValue }) => {
-    try {
-      const response = await apiService.postForm(ENDPOINTS.UPLOAD_TO_USER(userId), formData);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to upload files');
-    }
-  }
-);
-
 const initialState = {
   projects: [],
   currentProject: null,
@@ -311,24 +299,6 @@ const projectSlice = createSlice({
         state.uploadError = null;
       })
       .addCase(uploadFiles.rejected, (state, action) => {
-        state.uploading = false;
-        state.uploadError = action.payload;
-        state.uploadResult = null;
-      });
-
-    // Upload Files To User
-    builder
-      .addCase(uploadFilesToUser.pending, (state) => {
-        state.uploading = true;
-        state.uploadError = null;
-        state.uploadResult = null;
-      })
-      .addCase(uploadFilesToUser.fulfilled, (state, action) => {
-        state.uploading = false;
-        state.uploadResult = action.payload;
-        state.uploadError = null;
-      })
-      .addCase(uploadFilesToUser.rejected, (state, action) => {
         state.uploading = false;
         state.uploadError = action.payload;
         state.uploadResult = null;

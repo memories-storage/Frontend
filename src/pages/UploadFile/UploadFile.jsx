@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './UploadFile.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadFiles, uploadFilesToUser, clearUploadResult } from '../../store/slices/projectSlice';
+import { uploadFiles, clearUploadResult } from '../../store/slices/projectSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../../context/AuthContext';
-import { useUserId } from '../../hooks/useUserId';
+import { cookieUtils } from '../../utils/cookies';
  
 const getDeviceInfo = () => {
   return {
@@ -25,10 +25,8 @@ const isVideo = (file) => file.type.startsWith('video/');
 const UploadFile = () => {
   const [files, setFiles] = useState([]); // [{file, status, error, checked, previewUrl, uuid}]
   const [message, setMessage] = useState('');
-  const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const currentUserId = useUserId();
   const dispatch = useDispatch();
   const uploading = useSelector(state => state.project.uploading);
   const uploadError = useSelector(state => state.project.uploadError);
@@ -43,23 +41,10 @@ const UploadFile = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Get user ID from URL params or current user
+  // Get current user ID from cookies
   const getUserId = () => {
-    if (id) {
-      // The id parameter is the actual user ID (e.g., "123" from /upload/123)
-      return id;
-    }
-    // Use current user ID from hook
-    return currentUserId;
+    return cookieUtils.getUserId();
   };
-
-  // Check if uploading to own account
-  const isUploadingToOwnAccount = () => {
-    const targetUserId = getUserId();
-    return targetUserId === currentUserId;
-  };
-  
-
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files).map(file => ({
@@ -141,15 +126,9 @@ const UploadFile = () => {
       return;
     }
 
-    // Use appropriate upload method based on whether uploading to own account
-    if (isUploadingToOwnAccount()) {
-      // Upload to logged-in user's own account
-      dispatch(uploadFilesToUser({ formData, userId }));
-    } else {
-      // Upload to specific user's account (via URL params)
-      formData.append('userId', userId);
-      dispatch(uploadFiles({ formData }));
-    }
+    // Always append userId to form data and use the same upload method
+    formData.append('userId', userId);
+    dispatch(uploadFiles({ formData }));
   };
 
     // Handle upload results
@@ -172,38 +151,23 @@ const UploadFile = () => {
         
         // Update file statuses and remove successful files immediately
         setFiles(prevFiles => {
-          console.log('=== UPLOAD RESULT DEBUG ===');
-          console.log('Processing files:', prevFiles.length);
-          console.log('Successful files from backend:', successfulArray);
-          console.log('Failed files from backend:', failedArray);
-          console.log('Current files in state:', prevFiles.map(f => ({ name: f.file.name, uuid: f.uuid, fullName: f.uuid + '_' + f.file.name, checked: f.checked })));
-          
           const filtered = prevFiles.filter(file => {
             const fullName = file.uuid + '_' + file.file.name;
-            const isFailed = failedArray.some(failedFile => {
-              const match = failedFile.name === fullName;
-              console.log(`Checking failed: "${failedFile.name}" === "${fullName}" = ${match}`);
-              return match;
-            });
-            const isSuccessful = successfulArray.some(successfulFile => {
-              const match = successfulFile.name === fullName;
-              console.log(`Checking successful: "${successfulFile.name}" === "${fullName}" = ${match}`);
-              return match;
-            });
-            
-            console.log(`File ${file.file.name} (full: ${fullName}): isFailed=${isFailed}, isSuccessful=${isSuccessful}, checked=${file.checked}`);
+            const isFailed = failedArray.some(failedFile => 
+              failedFile.name === fullName
+            );
+            const isSuccessful = successfulArray.some(successfulFile => 
+              successfulFile.name === fullName
+            );
             
             if (isFailed) {
               // Keep failed files with error status
-              console.log(`Keeping failed file: ${file.file.name}`);
               return true;
             } else if (isSuccessful) {
               // Remove successful files immediately (regardless of checked status)
-              console.log(`Removing successful file: ${file.file.name}`);
               return false;
             }
             // Keep unchecked files that weren't uploaded
-            console.log(`Keeping unchecked file: ${file.file.name}`);
             return true;
           }).map(file => {
             const fullName = file.uuid + '_' + file.file.name;
@@ -215,8 +179,6 @@ const UploadFile = () => {
             }
             return file;
           });
-          console.log('Files after processing:', filtered.length, filtered.map(f => f.file.name));
-          console.log('=== END DEBUG ===');
           return filtered;
         });
         
@@ -262,7 +224,6 @@ const UploadFile = () => {
         dispatch(clearUploadResult());
       } else {
         // Handle unexpected response format
-        console.error('Unexpected upload response format:', uploadResult);
         setMessage('Upload completed with unexpected response.');
         dispatch(clearUploadResult());
       }
@@ -298,11 +259,7 @@ const UploadFile = () => {
       <h2 className="uploadfile-title">Upload Files</h2>
             {isAuthenticated && (
         <div className="uploadfile-info">
-          {isUploadingToOwnAccount() ? (
-            <p>📁 Uploading to your account</p>
-          ) : (
-            <p>📁 Uploading to user: {getUserId()}</p>
-          )}
+          <p>📁 Uploading to user: {getUserId()}</p>
 
         </div>
       )}
