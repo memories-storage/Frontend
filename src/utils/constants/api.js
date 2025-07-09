@@ -27,7 +27,6 @@ export const ENDPOINTS = {
 
   // File upload
   UPLOAD_FILES: '/upload/files',
-  UPLOAD_TO_USER: (userId) => `/upload/${userId}`,
   GET_IMAGES: '/images',
   DELETE_IMAGE: (id) => `/deleteImages/${id}`,
   
