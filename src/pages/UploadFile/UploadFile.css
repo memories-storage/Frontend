@@ -198,6 +198,44 @@
   min-height: 28px;
 }
 
+/* Authentication message styles */
+.auth-message {
+  background: #fff;
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(255, 152, 0, 0.2);
+}
+
+.auth-message p {
+  color: #e65100;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.login-button {
+  background: linear-gradient(90deg, #ff9800 60%, #ffb74d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.login-button:hover {
+  background: linear-gradient(90deg, #f57c00 60%, #ff9800 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+}
+
 .uploadfile-removebtn {
   position: absolute;
   top: 10px;

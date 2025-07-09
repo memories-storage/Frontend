@@ -14,6 +14,8 @@ import Settings from './components/Settings';
 import './styles/global.css';
 import UploadFile from './pages/UploadFile/UploadFile';
 import Scanner from './pages/Scanner';
+import PlaceholderPage from './pages/PlaceholderPage';
+import Files from './pages/Files';
 
 // Component to initialize auth state
 const AuthInitializer = () => {
@@ -42,8 +44,20 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/upload/:id" element={<UploadFile/>}/>
+                  <Route path="/upload" element={<UploadFile/>}/>
                   <Route path="/scanner" element={<Scanner/>}/>
-                    {/* Add more routes here as you create more pages */}
+                  
+                  {/* New routes for enhanced navigation */}
+                  <Route path="/dashboard" element={<PlaceholderPage />} />
+                  <Route path="/files" element={<Files />} />
+                  <Route path="/features" element={<PlaceholderPage />} />
+                  <Route path="/features/:feature" element={<PlaceholderPage />} />
+                  <Route path="/pricing" element={<PlaceholderPage />} />
+                  <Route path="/subscription" element={<PlaceholderPage />} />
+                  <Route path="/about" element={<PlaceholderPage />} />
+                  <Route path="/contact" element={<PlaceholderPage />} />
+                  
+                  {/* Add more routes here as you create more pages */}
                 </Routes>
               </main>
             </div>

@@ -27,6 +27,13 @@ export const ENDPOINTS = {
 
   // File upload
   UPLOAD_FILES: '/upload/files',
+  GET_IMAGES: '/images',
+  DELETE_IMAGE: (id) => `/deleteImages/${id}`,
+  
+  // Folder management
+  CREATE_FOLDER: '/folders',
+  GET_FOLDERS: '/folders',
+  DELETE_FOLDER: (id) => `/folders/${id}`,
   
   // Code endpoints
   CODE_FILES: '/code/files',
