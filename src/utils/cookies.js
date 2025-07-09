@@ -6,6 +6,7 @@ const COOKIE_CONFIG = {
   AUTH_TOKEN: 'authToken',
   REFRESH_TOKEN: 'refreshToken',
   USER_DATA: 'userData',
+  USER_ID: 'userId',
   
   // Cookie options
   OPTIONS: {
@@ -86,11 +87,29 @@ export const cookieUtils = {
     Cookies.remove(COOKIE_CONFIG.USER_DATA, { path: '/' });
   },
 
+  // Set user ID
+  setUserId: (userId) => {
+    if (userId) {
+      Cookies.set(COOKIE_CONFIG.USER_ID, userId, COOKIE_CONFIG.OPTIONS);
+    }
+  },
+
+  // Get user ID
+  getUserId: () => {
+    return Cookies.get(COOKIE_CONFIG.USER_ID);
+  },
+
+  // Remove user ID
+  removeUserId: () => {
+    Cookies.remove(COOKIE_CONFIG.USER_ID, { path: '/' });
+  },
+
   // Clear all auth cookies
   clearAuthCookies: () => {
     cookieUtils.removeAuthToken();
     cookieUtils.removeRefreshToken();
     cookieUtils.removeUserData();
+    cookieUtils.removeUserId();
   },
 
   // Check if user is authenticated

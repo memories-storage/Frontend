@@ -4,7 +4,7 @@ import { useTheme } from '../../../context/ThemeContext';
 import { useAuth } from '../../../context/AuthContext';
 import Button from '../../common/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-
+import { authUtils } from '../../../utils/auth';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -145,7 +145,7 @@ const Header = () => {
   const privateNavItems = [
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/files', label: 'Files', icon: '📁', hasDropdown: true },
-    { path: '/upload', label: 'Upload', icon: '📤' },
+    { path: `/upload/id=${authUtils.getCurrentUserId()}`, label: 'Upload', icon: '📤' },
     { path: '/pricing', label: 'Pricing', icon: '💰' },
   ];
 

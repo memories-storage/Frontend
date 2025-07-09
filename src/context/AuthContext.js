@@ -23,7 +23,19 @@ export const AuthProvider = ({ children }) => {
     
     if (authenticated) {
       const userData = authUtils.getCurrentUser();
-      setUser(userData);
+      const userId = authUtils.getCurrentUserId();
+      
+      if (userData) {
+        setUser(userData);
+      } else if (userId) {
+        // Create basic user object from userId if userData is not available
+        setUser({
+          id: userId,
+          // Other fields will be populated when user data is fetched
+        });
+      } else {
+        setUser(null);
+      }
     } else {
       setUser(null);
     }

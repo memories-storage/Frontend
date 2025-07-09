@@ -44,7 +44,6 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/upload/:id" element={<UploadFile/>}/>
-                  <Route path="/upload" element={<UploadFile/>}/>
                   <Route path="/scanner" element={<Scanner/>}/>
                   
                   {/* New routes for enhanced navigation */}

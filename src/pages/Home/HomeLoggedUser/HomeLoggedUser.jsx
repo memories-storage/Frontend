@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Button from '../../../components/common/Button';
 import { useAuth } from '../../../context/AuthContext';
+import { useUserId } from '../../../hooks/useUserId';
 import { selectUserProfile } from '../../../store/slices/userSlice';
 import { apiService } from '../../../services/api';
 import { ENDPOINTS } from '../../../utils/constants/api';
@@ -17,6 +18,7 @@ const HomeLoggedUser = () => {
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'photos', 'videos'
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const currentUserId = useUserId();
   const profile = useSelector(selectUserProfile);
 
   useEffect(() => {
@@ -151,7 +153,7 @@ const HomeLoggedUser = () => {
             <Button 
               variant="outline" 
               size="medium"
-              onClick={() => navigate('/upload')}
+              onClick={() => navigate(`/upload/id=${currentUserId}`)}  // use userId of logged in user
             >
               Upload Files
             </Button>
