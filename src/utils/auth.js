@@ -12,6 +12,22 @@ export const authUtils = {
     return cookieUtils.getUserData();
   },
 
+  // Get current user ID
+  getCurrentUserId: () => {
+    return cookieUtils.getUserId();
+  },
+
+  // Get current user ID with fallback to user object
+  getUserId: (userObject = null) => {
+    // First try to get from user object if provided
+    if (userObject?.id || userObject?.userId) {
+      return userObject.id || userObject.userId;
+    }
+    
+    // Then try to get from cookies
+    return cookieUtils.getUserId();
+  },
+
   // Get auth token
   getAuthToken: () => {
     return cookieUtils.getAuthToken();
@@ -63,6 +79,11 @@ export const authUtils = {
     
     if (userData) {
       cookieUtils.setUserData(userData);
+      // Also store userId separately for easy access
+      if (userData.id || userData.userId) {
+        const userId = userData.id || userData.userId;
+        cookieUtils.setUserId(userId);
+      }
     }
   },
 

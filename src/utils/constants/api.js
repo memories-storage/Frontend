@@ -1,7 +1,7 @@
 // API Base URLs
 // export const API_BASE_URL =  'http://localhost:8080/api';
 // export const API_BASE_URL = `${process.env.REACT_APP_API_URL}api`;
-export const API_BASE_URL = `${process.env.REACT_APP_API_URL}api` || 'http://localhost:8080/api';
+export const API_BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}api` : 'http://localhost:8080/api';
 
 // API Endpoints
 export const ENDPOINTS = {
@@ -27,6 +27,7 @@ export const ENDPOINTS = {
 
   // File upload
   UPLOAD_FILES: '/upload/files',
+  UPLOAD_TO_USER: (userId) => `/upload/${userId}`,
   GET_IMAGES: '/images',
   DELETE_IMAGE: (id) => `/deleteImages/${id}`,
   

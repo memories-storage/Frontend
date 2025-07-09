@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './UploadFile.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadFiles, clearUploadResult } from '../../store/slices/projectSlice';
+import { uploadFiles, uploadFilesToUser, clearUploadResult } from '../../store/slices/projectSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../../context/AuthContext';
-
+import { useUserId } from '../../hooks/useUserId';
+ 
 const getDeviceInfo = () => {
   return {
     userAgent: navigator.userAgent,
@@ -26,7 +27,8 @@ const UploadFile = () => {
   const [message, setMessage] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const currentUserId = useUserId();
   const dispatch = useDispatch();
   const uploading = useSelector(state => state.project.uploading);
   const uploadError = useSelector(state => state.project.uploadError);
@@ -41,15 +43,20 @@ const UploadFile = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Get user ID from auth context or URL params
+  // Get user ID from URL params or current user
   const getUserId = () => {
     if (id) {
-      // Extract user ID from URL parameter (format: userId=123)
-      const userIdMatch = id.match(/userId=([^&]+)/);
-      return userIdMatch ? userIdMatch[1] : null;
+      // The id parameter is the actual user ID (e.g., "123" from /upload/123)
+      return id;
     }
-    // Use user ID from auth context
-    return user?.id || user?.userId;
+    // Use current user ID from hook
+    return currentUserId;
+  };
+
+  // Check if uploading to own account
+  const isUploadingToOwnAccount = () => {
+    const targetUserId = getUserId();
+    return targetUserId === currentUserId;
   };
   
 
@@ -128,14 +135,21 @@ const UploadFile = () => {
     formData.append('deviceInfo', JSON.stringify(deviceInfo));
     
     const userId = getUserId();
-    if (userId) {
-      formData.append('userId', userId);
-    } else {
+    
+    if (!userId) {
       setMessage('Error: User ID not found. Please log in again.');
       return;
     }
-    
-    dispatch(uploadFiles({ formData }));
+
+    // Use appropriate upload method based on whether uploading to own account
+    if (isUploadingToOwnAccount()) {
+      // Upload to logged-in user's own account
+      dispatch(uploadFilesToUser({ formData, userId }));
+    } else {
+      // Upload to specific user's account (via URL params)
+      formData.append('userId', userId);
+      dispatch(uploadFiles({ formData }));
+    }
   };
 
     // Handle upload results
@@ -282,6 +296,16 @@ const UploadFile = () => {
   return (
     <div className="uploadfile-root">
       <h2 className="uploadfile-title">Upload Files</h2>
+            {isAuthenticated && (
+        <div className="uploadfile-info">
+          {isUploadingToOwnAccount() ? (
+            <p>📁 Uploading to your account</p>
+          ) : (
+            <p>📁 Uploading to user: {getUserId()}</p>
+          )}
+
+        </div>
+      )}
       <div className="uploadfile-header-row">
         <div className="uploadfile-input-container">
           <input 

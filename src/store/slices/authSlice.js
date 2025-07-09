@@ -10,12 +10,15 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await apiService.post(ENDPOINTS.LOGIN, credentials);
       
-      // Store tokens in cookies
+      // Store tokens and user data in cookies
       if (response.accessToken) {
         cookieUtils.setAuthToken(response.accessToken);
       }
       if (response.refreshToken) {
         cookieUtils.setRefreshToken(response.refreshToken);
+      }
+      if (response.userId) {
+        cookieUtils.setUserId(response.userId);
       }
       
       return response;
@@ -127,8 +130,23 @@ const authSlice = createSlice({
     initializeAuth: (state) => {
       const token = cookieUtils.getAuthToken();
       const userData = cookieUtils.getUserData();
+      const userId = cookieUtils.getUserId();
+      
       state.isAuthenticated = !!token;
-      state.user = userData;
+      
+      // If we have userData, use it; otherwise create user object from userId
+      if (userData) {
+        state.user = userData;
+      } else if (userId) {
+        // Create basic user object from userId if userData is not available
+        state.user = {
+          id: userId,
+          // Other fields will be populated when user data is fetched
+        };
+      } else {
+        state.user = null;
+      }
+      
       state.isInitialized = true;
     },
     clearAuthError: (state) => {
@@ -153,7 +171,13 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        // Create user object with userId from backend response
+        state.user = {
+          id: action.payload.userID || action.payload.userId, // Try both field names
+          email: action.payload.email,
+          role: action.payload.role,
+          // Add any other user fields that might be available
+        };
         state.isAuthenticated = true;
         state.error = null;
       })

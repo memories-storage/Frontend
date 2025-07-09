@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../services/api';
 import { ENDPOINTS } from '../../utils/constants/api';
 import { useAuth } from '../../context/AuthContext';
+import { cookieUtils } from '../../utils/cookies';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -45,11 +46,24 @@ const Login = () => {
             formData.append('password', password);
 
             const response = await apiService.postForm(ENDPOINTS.LOGIN, formData);
-
+            
             // Handle successful login
             if (response.token) {
+                // Create user object from response data
+                const userData = {
+                    id: response.userID || response.userId, // Try both field names
+                    email: email.trim(),
+                    role: response.role
+                };
+                
+                // Store userId in cookies for easy access
+                if (response.userID || response.userId) {
+                    const userId = response.userID || response.userId;
+                    cookieUtils.setUserId(userId);
+                }
+                
                 // Use the login function from AuthContext
-                login(response.token, response.user);
+                login(response.token, userData);
 
                 setSuccess('Login successful! Redirecting...');
                 

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import Button from '../../components/common/Button';
 import { useAuth } from '../../context/AuthContext';
-import { selectUserProfile } from '../../store/slices/userSlice';
 import { apiService } from '../../services/api';
 import { ENDPOINTS } from '../../utils/constants/api';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import './Files.css';
 
 const Files = () => {
@@ -22,12 +22,33 @@ const Files = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false); // Selection mode toggle
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, logout } = useAuth();
-  const profile = useSelector(selectUserProfile);
+  const { user } = useAuth();
+
+  const fetchUserFiles = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.get(ENDPOINTS.GET_IMAGES);
+      // Add upload date to files (using current date as fallback since backend doesn't provide it)
+      const filesWithDate = (response || []).map(file => ({
+        ...file,
+        uploadDate: new Date(), // This should come from backend in real implementation
+        uploadDateString: new Date().toLocaleDateString(),
+        isFavorite: false,
+        type: 'file'
+      }));
+      setFiles(filesWithDate);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching files:', err);
+      setError('Failed to load your files. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchUserFiles();
-  }, []);
+  }, [fetchUserFiles]);
 
   // Handle tab parameter from URL
   useEffect(() => {
@@ -36,53 +57,6 @@ const Files = () => {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
-
-  const fetchUserFiles = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch both images and folders
-      const [imagesResponse, foldersResponse] = await Promise.all([
-        apiService.get(ENDPOINTS.GET_IMAGES),
-        apiService.get(ENDPOINTS.GET_FOLDERS)
-      ]);
-      
-      // Process images
-      const imagesWithMetadata = (imagesResponse || []).map(file => ({
-        ...file,
-        uploadDate: new Date(),
-        uploadDateString: new Date().toLocaleDateString(),
-        isFavorite: false, // This should come from backend in real implementation
-        type: 'file'
-      }));
-      
-      // Process folders
-      const foldersWithMetadata = (foldersResponse || []).map(folder => ({
-        ...folder,
-        id: folder.id,
-        name: folder.name,
-        url: null,
-        uploadDate: new Date(folder.created_at),
-        uploadDateString: new Date(folder.created_at).toLocaleDateString(),
-        isFavorite: false,
-        type: 'folder'
-      }));
-      
-      // Combine and sort by date
-      const allFiles = [...foldersWithMetadata, ...imagesWithMetadata];
-      allFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
-      
-      setFiles(allFiles);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching files:', err);
-      setError('Failed to load your files. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
 
   const handleFileClick = (file) => {
     if (isSelectionMode) {
@@ -274,22 +248,23 @@ const Files = () => {
     setIsSelectionMode(false);
   };
 
-
-
   const isVideoFile = (url) => {
+    if (!url) return false;
     const videoExtensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm'];
     return videoExtensions.some(ext => url.toLowerCase().includes(ext));
   };
 
   const isImageFile = (url) => {
+    if (!url) return false;
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
     return imageExtensions.some(ext => url.toLowerCase().includes(ext));
   };
 
   const getFileType = (url, type) => {
     if (type === 'folder') return 'folder';
-    if (isVideoFile(url)) return 'video';
+    if (!url) return 'file'; // Default for files without URL
     if (isImageFile(url)) return 'image';
+    if (isVideoFile(url)) return 'video';
     return 'file';
   };
 
@@ -327,6 +302,8 @@ const Files = () => {
   const filteredFiles = getFilteredFiles();
   const groupedFiles = groupFilesByDate(filteredFiles);
   const sortedDates = Object.keys(groupedFiles).sort((a, b) => new Date(b) - new Date(a));
+  
+
 
   if (loading) {
     return (
@@ -481,13 +458,15 @@ const Files = () => {
       {error && (
         <div className="error-message">
           <p>{error}</p>
-          <Button 
-            variant="outline" 
-            size="small"
-            onClick={fetchUserFiles}
-          >
-            Retry
-          </Button>
+          {user && (
+            <Button 
+              variant="outline" 
+              size="small"
+              onClick={fetchUserFiles}
+            >
+              Retry
+            </Button>
+          )}
         </div>
       )}
 
@@ -533,8 +512,17 @@ const Files = () => {
                   onClick={isAllSelected() ? clearSelection : selectAllFiles}
                   className="select-all-btn"
                 >
-                  {isAllSelected() ? '☐ Deselect All' : 
-                   isPartiallySelected() ? '☑ Select All' : '☐ Select All'}
+                  {isAllSelected() ? (
+                    <>
+                      <CheckBoxIcon style={{ marginRight: '4px' }} />
+                      Deselect All
+                    </>
+                  ) : (
+                    <>
+                      <CheckBoxOutlineBlankIcon style={{ marginRight: '4px' }} />
+                      {isPartiallySelected() ? 'Select All' : 'Select All'}
+                    </>
+                  )}
                 </Button>
                 {isPartiallySelected() && (
                   <span className="partial-selection">
@@ -557,15 +545,19 @@ const Files = () => {
                       {/* Selection Checkbox */}
                       {isSelectionMode && (
                         <div className="selection-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={selectedFiles.has(file.id)}
-                            onChange={(e) => {
+                          <div
+                            className="mui-checkbox"
+                            onClick={(e) => {
                               e.stopPropagation();
                               toggleFileSelection(file.id);
                             }}
-                            className="file-checkbox"
-                          />
+                          >
+                            {selectedFiles.has(file.id) ? (
+                              <CheckBoxIcon className="checkbox-icon checked" />
+                            ) : (
+                              <CheckBoxOutlineBlankIcon className="checkbox-icon unchecked" />
+                            )}
+                          </div>
                         </div>
                       )}
 
@@ -573,9 +565,31 @@ const Files = () => {
                         {getFileType(file.url, file.type) === 'folder' ? (
                           <div className="folder-icon">📁</div>
                         ) : getFileType(file.url, file.type) === 'image' ? (
-                          <img src={file.url} alt="File preview" />
+                          <>
+                            <img 
+                              src={file.url} 
+                              alt="File preview" 
+                              onError={(e) => {
+                                console.error('Failed to load image:', file.url);
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                            <div className="file-icon" style={{ display: 'none' }}>📄</div>
+                          </>
                         ) : getFileType(file.url, file.type) === 'video' ? (
-                          <video src={file.url} muted />
+                          <>
+                            <video 
+                              src={file.url} 
+                              muted 
+                              onError={(e) => {
+                                console.error('Failed to load video:', file.url);
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                            <div className="file-icon" style={{ display: 'none' }}>📄</div>
+                          </>
                         ) : (
                           <div className="file-icon">📄</div>
                         )}
@@ -598,7 +612,7 @@ const Files = () => {
                       </div>
                       <div className="file-info">
                         <p className="file-name">
-                          {getFileType(file.url, file.type) === 'folder' ? file.name : file.url.split('/').pop()}
+                          {getFileType(file.url, file.type) === 'folder' ? file.name : (file.url ? file.url.split('/').pop() : 'Unknown file')}
                         </p>
                         <span className="file-type">{getFileType(file.url, file.type)}</span>
                       </div>
@@ -619,15 +633,32 @@ const Files = () => {
               <h3>
                 {getFileType(selectedFile.url, selectedFile.type) === 'folder' 
                   ? selectedFile.name 
-                  : selectedFile.url.split('/').pop()}
+                  : (selectedFile.url ? selectedFile.url.split('/').pop() : 'Unknown file')}
               </h3>
               <button className="close-button" onClick={closeModal}>×</button>
             </div>
             <div className="modal-body">
               {getFileType(selectedFile.url, selectedFile.type) === 'image' ? (
-                <img src={selectedFile.url} alt="Full preview" />
+                <img 
+                  src={selectedFile.url} 
+                  alt="Full preview" 
+                  onError={(e) => {
+                    console.error('Failed to load image in modal:', selectedFile.url);
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
               ) : getFileType(selectedFile.url, selectedFile.type) === 'video' ? (
-                <video src={selectedFile.url} controls autoPlay />
+                <video 
+                  src={selectedFile.url} 
+                  controls 
+                  autoPlay 
+                  onError={(e) => {
+                    console.error('Failed to load video in modal:', selectedFile.url);
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
               ) : getFileType(selectedFile.url, selectedFile.type) === 'folder' ? (
                 <div className="folder-preview">
                   <div className="folder-icon-large">📁</div>
@@ -640,13 +671,23 @@ const Files = () => {
                   <p>File preview not available</p>
                 </div>
               )}
+              
+              {/* Fallback for failed image/video loads */}
+              {(getFileType(selectedFile.url, selectedFile.type) === 'image' || 
+                getFileType(selectedFile.url, selectedFile.type) === 'video') && (
+                <div className="file-preview-fallback" style={{ display: 'none' }}>
+                  <div className="file-icon-large">📄</div>
+                  <p>File preview not available</p>
+                  <p>URL: {selectedFile.url}</p>
+                </div>
+              )}
             </div>
             <div className="modal-footer">
               <Button 
                 variant="outline" 
                 size="medium"
                 onClick={() => window.open(selectedFile.url, '_blank')}
-                disabled={getFileType(selectedFile.url, selectedFile.type) === 'folder'}
+                disabled={getFileType(selectedFile.url, selectedFile.type) === 'folder' || !selectedFile.url}
               >
                 Open in New Tab
               </Button>
