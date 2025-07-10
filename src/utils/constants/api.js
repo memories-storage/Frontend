@@ -1,7 +1,7 @@
 // API Base URLs
-// export const API_BASE_URL =  'http://localhost:8080/api';
+export const API_BASE_URL =  'http://localhost:8080/api';
 // export const API_BASE_URL = `${process.env.REACT_APP_API_URL}api`;
-export const API_BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}api` : 'http://localhost:8080/api';
+// export const API_BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}api` : 'http://localhost:8080/api';
 
 // API Endpoints
 export const ENDPOINTS = {
@@ -33,6 +33,7 @@ export const ENDPOINTS = {
   // Folder management
   CREATE_FOLDER: '/folders',
   GET_FOLDERS: '/folders',
+  GET_FOLDER: (id) => `/folders/${id}`,
   DELETE_FOLDER: (id) => `/folders/${id}`,
   
   // Code endpoints

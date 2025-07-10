@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/common/Button';
+import HeroSection from '../../../components/common/HeroSection';
+import FeaturesSection from '../../../components/common/FeaturesSection';
 import './HomeNonLoggedUser.css';
 
 const HomeNonLoggedUser = () => {
@@ -73,56 +75,33 @@ const HomeNonLoggedUser = () => {
   };
 
   const handleLearnMore = () => {
-    // Scroll to features section
     document.getElementById('features-section').scrollIntoView({ 
       behavior: 'smooth' 
     });
   };
 
+  const heroVisualElements = [
+    { icon: '📸', label: 'Photos' },
+    { icon: '🎥', label: 'Videos' },
+    { icon: '📄', label: 'Documents' }
+  ];
+
   return (
     <div className="home-non-logged-user">
       {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1>Store, Share, and Access Your Files Anywhere</h1>
-            <p className="hero-subtitle">
-              A secure and reliable platform for storing your photos, videos, and documents. 
-              Access your files from any device, share them easily, and keep them safe.
-            </p>
-            <div className="hero-actions">
-              <Button 
-                variant="primary" 
-                size="large"
-                onClick={handleGetStarted}
-              >
-                Get Started Free
-              </Button>
-              <Button 
-                variant="outline" 
-                size="large"
-                onClick={handleLearnMore}
-              >
-                Learn More
-              </Button>
-            </div>
-          </div>
-          <div className="hero-visual">
-            <div className="floating-card card-1">
-              <div className="card-icon">📸</div>
-              <span>Photos</span>
-            </div>
-            <div className="floating-card card-2">
-              <div className="card-icon">🎥</div>
-              <span>Videos</span>
-            </div>
-            <div className="floating-card card-3">
-              <div className="card-icon">📄</div>
-              <span>Documents</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection
+        title="Store, Share, and Access Your Files Anywhere"
+        subtitle="A secure and reliable platform for storing your photos, videos, and documents. Access your files from any device, share them easily, and keep them safe."
+        primaryAction={{
+          label: "Get Started Free",
+          onClick: handleGetStarted
+        }}
+        secondaryAction={{
+          label: "Learn More",
+          onClick: handleLearnMore
+        }}
+        visualElements={heroVisualElements}
+      />
 
       {/* Benefits Section */}
       <section className="benefits">
@@ -141,25 +120,11 @@ const HomeNonLoggedUser = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features-section" className="features">
-        <div className="container">
-          <h2>Powerful Features for Everyone</h2>
-          <div className="features-grid">
-            {features.map((feature, index) => (
-              <div key={index} className="feature-card">
-                <div 
-                  className="feature-icon"
-                  style={{ backgroundColor: feature.color }}
-                >
-                  {feature.icon}
-                </div>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FeaturesSection
+        title="Powerful Features for Everyone"
+        features={features}
+        id="features-section"
+      />
 
       {/* How It Works Section */}
       <section className="how-it-works">
