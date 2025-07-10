@@ -1,0 +1,143 @@
+.folder-example {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--background-color);
+  min-height: 100vh;
+}
+
+.folder-example-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.folder-example-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.folder-example-header p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.folder-example-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.folder-explorer-section {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.folder-explorer-section h2 {
+  margin: 0;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.explorer-container {
+  height: 600px;
+}
+
+.folder-info-section,
+.folder-history-section {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.folder-info-section h2,
+.folder-history-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.folder-info h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.folder-info p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.folder-info p strong {
+  color: var(--text-primary);
+}
+
+.no-selection,
+.no-history {
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin: 0;
+}
+
+.folder-history {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.history-entry:last-child {
+  border-bottom: none;
+}
+
+.history-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.history-time {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .folder-example {
+    padding: 16px;
+  }
+  
+  .folder-example-header h1 {
+    font-size: 24px;
+  }
+  
+  .folder-example-header p {
+    font-size: 14px;
+  }
+  
+  .folder-example-content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .explorer-container {
+    height: 400px;
+  }
+} 
