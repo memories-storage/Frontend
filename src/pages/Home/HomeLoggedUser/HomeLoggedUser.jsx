@@ -17,8 +17,6 @@ const HomeLoggedUser = () => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const [selectedFile, setSelectedFile] = useState(null);
-  // const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -53,25 +51,7 @@ const HomeLoggedUser = () => {
   };
 
   const handleFileClick = (file) => {
-    // setSelectedFile(file);
-    // setShowModal(true);
     console.log('File clicked:', file);
-  };
-
-  const closeModal = () => {
-    // setShowModal(false);
-    // setSelectedFile(null);
-  };
-
-  const handleDeleteFile = async (fileId) => {
-    try {
-      await apiService.delete(ENDPOINTS.DELETE_IMAGE(fileId));
-      setFiles(files.filter(file => file.id !== fileId));
-      closeModal();
-    } catch (err) {
-      console.error('Error deleting file:', err);
-      setError('Failed to delete file. Please try again.');
-    }
   };
 
   const getDisplayName = () => {
