@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 
 # Handle React Router - redirect all routes to index.html
 /*    /index.html   200
@@ -7,3 +8,13 @@
 
 # Handle API redirects if needed
 # /api/*    https://your-backend-domain.com/api/:splat    200 
+=======
+# Handle React Router - redirect all routes to index.html
+/*    /index.html   200
+
+# Redirect old URLs if needed
+# /old-page    /new-page    301
+
+# Handle API redirects if needed
+# /api/*    https://your-backend-domain.com/api/:splat    200 
+>>>>>>> Stashed changes
