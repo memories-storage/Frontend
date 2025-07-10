@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Button from '../../../components/common/Button';
 import FileGrid from '../../../components/common/FileGrid';
-import FileModal from '../../../components/common/FileModal';
+// import FileModal from '../../../components/common/FileModal';
 import TabNavigation from '../../../components/common/TabNavigation';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserId } from '../../../hooks/useUserId';
@@ -17,8 +17,8 @@ const HomeLoggedUser = () => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  // const [selectedFile, setSelectedFile] = useState(null);
+  // const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -53,13 +53,14 @@ const HomeLoggedUser = () => {
   };
 
   const handleFileClick = (file) => {
-    setSelectedFile(file);
-    setShowModal(true);
+    // setSelectedFile(file);
+    // setShowModal(true);
+    console.log('File clicked:', file);
   };
 
   const closeModal = () => {
-    setShowModal(false);
-    setSelectedFile(null);
+    // setShowModal(false);
+    // setSelectedFile(null);
   };
 
   const handleDeleteFile = async (fileId) => {
@@ -219,12 +220,12 @@ const HomeLoggedUser = () => {
       </div>
 
       {/* File Modal */}
-      <FileModal
+      {/* <FileModal
         file={selectedFile}
         isOpen={showModal}
         onClose={closeModal}
         onDelete={handleDeleteFile}
-      />
+      /> */}
     </div>
   );
 };
