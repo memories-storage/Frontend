@@ -1,0 +1,79 @@
+.folders-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--background-color);
+}
+
+.folders-header {
+  padding: 24px 32px;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.folders-title h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.folders-title p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.folders-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.selected-folder-info {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 300px;
+  z-index: 1000;
+}
+
+.selected-folder-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.selected-folder-info p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .folders-header {
+    padding: 16px 20px;
+  }
+  
+  .folders-title h1 {
+    font-size: 24px;
+  }
+  
+  .folders-title p {
+    font-size: 14px;
+  }
+  
+  .selected-folder-info {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+  }
+} 
