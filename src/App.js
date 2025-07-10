@@ -16,6 +16,7 @@ import UploadFile from './pages/UploadFile/UploadFile';
 import Scanner from './pages/Scanner';
 import PlaceholderPage from './pages/PlaceholderPage';
 import Files from './pages/Files';
+import Folders from './pages/Folders';
 
 // Component to initialize auth state
 const AuthInitializer = () => {
@@ -49,6 +50,7 @@ function App() {
                   {/* New routes for enhanced navigation */}
                   <Route path="/dashboard" element={<PlaceholderPage />} />
                   <Route path="/files" element={<Files />} />
+                  <Route path="/folders" element={<Folders />} />
                   <Route path="/features" element={<PlaceholderPage />} />
                   <Route path="/features/:feature" element={<PlaceholderPage />} />
                   <Route path="/pricing" element={<PlaceholderPage />} />
