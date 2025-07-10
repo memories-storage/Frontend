@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useUserProfile } from '../../hooks/useDataFetching.js';
 import { 
   logoutUser,
@@ -10,7 +10,6 @@ import {
   changePassword
 } from '../../store/slices/userSlice.js';
 import { useAuth } from '../../context/AuthContext';
-import { selectIsAuthenticated as selectReduxIsAuthenticated } from '../../store/slices/authSlice.js';
 import { cookieUtils } from '../../utils/cookies';
 import './UserDashboard.css';
 
@@ -270,7 +269,6 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSave, loading }) => {
 const UserDashboard = () => {
   const dispatch = useDispatch();
   const { isAuthenticated: contextIsAuthenticated, logout } = useAuth(); // Use Context authentication
-  const reduxIsAuthenticated = useSelector(selectReduxIsAuthenticated);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -282,7 +280,6 @@ const UserDashboard = () => {
   // Debug information
   const debugInfo = {
     contextIsAuthenticated,
-    reduxIsAuthenticated,
     cookieToken: !!cookieUtils.getAuthToken(),
     cookieUserData: !!cookieUtils.getUserData(),
     profileData: !!profile
